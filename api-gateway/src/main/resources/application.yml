@@ -8,6 +8,6 @@ spring:
     gateway:
       routes:
         - id: book-service
-          uri: http://localhost:8080
+          uri: http://book-service:8080
           predicates:
             - Path=/api/books/**
