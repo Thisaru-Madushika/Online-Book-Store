@@ -1,13 +1,32 @@
 server:
+  # The port on which the API Gateway runs
   port: 8081
 
 spring:
   application:
     name: api-gateway
+    
+  # Redis connection settings (will be overridden by docker-compose)
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      
   cloud:
     gateway:
       routes:
+        # Configuration for Book Service
         - id: book-service
-          uri: http://localhost:8080
+          uri: http://book-service:8080
           predicates:
             - Path=/api/books/**
+          filters:
+            # Rate Limiting Filter Configuration
+            - name: RequestRateLimiter
+              args:
+                # Number of requests allowed per second
+                redis-rate-limiter.replenishRate: 10
+                # Maximum burst capacity
+                redis-rate-limiter.burstCapacity: 20
+                # Cost of a single request
+                redis-rate-limiter.requestedTokens: 1
